@@ -5,7 +5,6 @@
 // 作成者:小林慎
 // ---------------------------------------------------------
 using UnityEngine;
-using System.Collections;
 using TMPro;
 
 /// <summary>
@@ -26,7 +25,12 @@ public class MoveManager : MonoBehaviour
 	private int _moveBlockCheckCount = 0;
 
 	// ブロックを引ける状態かを表示するテキスト
-	private TMPro.TMP_Text _isPullBlockModeText = default;
+	private TMP_Text _isPullBlockModeText = default;
+	private string _pullBlockModeTextTag = "PullBlockModeText";
+
+
+    private string _pullModeOn = "On";
+	private string _pullModeOff = "Off";
 
 	// 各クラスの定義
 	private StageArrayData _stageArrayData = default;
@@ -45,7 +49,7 @@ public class MoveManager : MonoBehaviour
 		_blockProcess = GetComponent<BlockProcess>();
 
 		// ブロックを引ける状態かを表示するテキストを取得する
-		_isPullBlockModeText = GameObject.FindWithTag("PullBlockModeText").GetComponent<TMP_Text>();
+		_isPullBlockModeText = GameObject.FindWithTag(_pullBlockModeTextTag).GetComponent<TMP_Text>();
 	}
 
 	/// <summary>
@@ -269,8 +273,7 @@ public class MoveManager : MonoBehaviour
     {
 		// ブロックを引ける状態にする
 		_isPullBlockMode = true;
-		_isPullBlockModeText.SetText("On");
-		Debug.Log("A");
+		_isPullBlockModeText.SetText(_pullModeOn);
     }
 
 	/// <summary>
@@ -280,8 +283,7 @@ public class MoveManager : MonoBehaviour
     {
 		// ブロックを引けない状態にする
 		_isPullBlockMode = false;
-		_isPullBlockModeText.SetText("Off");
-		Debug.Log("B");
+		_isPullBlockModeText.SetText(_pullModeOff);
 	}
 	#endregion
 }

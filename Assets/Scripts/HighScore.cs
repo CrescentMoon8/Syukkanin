@@ -5,7 +5,6 @@
 // 作成者:小林慎
 // ---------------------------------------------------------
 using UnityEngine;
-using System.Collections;
 using TMPro;
 
 /// <summary>
@@ -16,6 +15,8 @@ public class HighScore : MonoBehaviour
 	#region 変数
 	// ハイスコアを表示するためのテキスト
 	[SerializeField] private TMP_Text _highScoreText;
+
+	private string _highScore = "HighScore";
 	#endregion
 
 	#region メソッド
@@ -25,7 +26,7 @@ public class HighScore : MonoBehaviour
 	void Start ()
 	{
 		// ハイスコアを表示する
-		_highScoreText.SetText(PlayerPrefs.GetInt("HighScore", 0).ToString());
+		_highScoreText.SetText(PlayerPrefs.GetInt(_highScore, 0).ToString());
 	}
 	#endregion
 }

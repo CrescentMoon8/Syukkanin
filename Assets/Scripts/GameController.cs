@@ -194,7 +194,6 @@ public class GameController : MonoBehaviour
 				// ブロックを引くための入力があるか
 				if (Input.GetButtonDown(_pullBlockInput))
 				{
-					Debug.Log("ON");
 					// ブロックを引ける状態にする
 ;					_moveManager.SetTruePullMode();
 				}
@@ -202,7 +201,6 @@ public class GameController : MonoBehaviour
 				// ブロックを引くための入力がないか
 				if (Input.GetButtonUp(_pullBlockInput))
 				{
-                    Debug.Log("OFF");
                     // ブロックを引ける状態を解除する
                     _moveManager.SetFalsePullMode();
 				}

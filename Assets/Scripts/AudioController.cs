@@ -20,6 +20,8 @@ public class AudioController : MonoBehaviour
 	[SerializeField] 
 	private AudioClip _levelUpSe = default;
 
+	private string _seObjectTag = "SE";
+
 	// 各クラスの定義
 	private AudioSource _audioObject = default;
 	#endregion
@@ -35,7 +37,7 @@ public class AudioController : MonoBehaviour
 	private void Awake()
 	{
 		// 各クラスの初期化
-		_audioObject = GameObject.FindWithTag("SE").GetComponent<AudioSource>();
+		_audioObject = GameObject.FindWithTag(_seObjectTag).GetComponent<AudioSource>();
 	}
 
 	/// <summary>
