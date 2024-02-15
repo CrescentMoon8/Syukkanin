@@ -13,12 +13,6 @@ using System.Collections;
 public class StageArrayData : MonoBehaviour
 {
     #region 変数
-    #region 配列
-    // ステージの情報を入れるための配列
-    private int[,] _stageArrayData = default;
-	// ターゲットの情報を入れるための配列
-	private int[,] _targetData = default;
-    #endregion
 
     #region タグリスト
     /// <summary>
@@ -52,13 +46,14 @@ public class StageArrayData : MonoBehaviour
 	// プレイヤーの座標
     public Vector2 PlayerPosition { get; set; }
 	// ステージの情報を入れるための配列
-	public int[,] StageArray { get => _stageArrayData; set => _stageArrayData = value; }
-	// ステージの横の最大サイズ
-    public int HorizontalMaxSize { get => _horizontalMaxSize; set => _horizontalMaxSize = value; }
-	// ステージの縦の最大サイズ
-    public int VerticalMaxSize { get => _verticalMaxSize; set => _verticalMaxSize = value; }
+	public int[,] StageArray { get; set; }
 	// ターゲットの情報を入れるための配列
-	public int[,] TargetData { get => _targetData; set => _targetData = value; }
+	public int[,] TargetData { get; set; }
+	// ステージの横の最大サイズ
+	public int HorizontalMaxSize { get { return _horizontalMaxSize; } }
+	// ステージの縦の最大サイズ
+    public int VerticalMaxSize { get { return _verticalMaxSize; } }
+
 	#endregion
 
 	#region メソッド
@@ -116,14 +111,14 @@ public class StageArrayData : MonoBehaviour
 			if(HorizontalMaxSize < positionX)
             {
 				// 横の最大サイズを設定する
-				HorizontalMaxSize = positionX;
+				_horizontalMaxSize = positionX;
             }
 
 			// 座標と現在の縦の最大サイズを比較する
 			if (VerticalMaxSize < positionY)
             {
 				// 縦の最大サイズを設定する
-				VerticalMaxSize = positionY;
+				_verticalMaxSize = positionY;
             }
         }
     }

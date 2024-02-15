@@ -14,8 +14,8 @@ public class MoveManager : MonoBehaviour
 {
 	#region 変数
 	// 移動チェック回数判定用定数
-	const int FIRST = 1;
-	const int SECOND = 2;
+	private const int FIRST = 1;
+	private const int SECOND = 2;
 
 	// ブロックを引ける状態か
 	[SerializeField] 
@@ -61,7 +61,7 @@ public class MoveManager : MonoBehaviour
 	/// <param name="preCol">移動前横情報</param>
 	/// <param name="nextRow">移動後縦情報</param>
 	/// <param name="nextCol">移動後横情報</param>
-	public void MoveData(int preRow, int preCol, int nextRow, int nextCol)
+	private void MoveData(int preRow, int preCol, int nextRow, int nextCol)
     {
 		// 動かしたいオブジェクトを取得する
 		GameObject moveObject = _stageArrayData.GetStageObject(_stageArrayData.StageArray[preRow, preCol], preRow, preCol);
@@ -88,7 +88,7 @@ public class MoveManager : MonoBehaviour
     /// <param name="y">移動先Y座標</param>
     /// <param name="x">移動先X座標</param>
     /// <returns></returns>
-    public bool BlockMoveCheck(int y, int x)
+    private bool BlockMoveCheck(int y, int x)
 	{
 		// ブロック移動チェック回数を加算する
 		_moveBlockCheckCount++;
@@ -129,7 +129,7 @@ public class MoveManager : MonoBehaviour
 	/// <param name="preCol">移動前横情報</param>
 	/// <param name="nextRow">移動後縦情報</param>
 	/// <param name="nextCol">移動後横情報</param>
-	public bool BlockMove(int preRow, int preCol, int nextRow, int nextCol)
+	private bool BlockMove(int preRow, int preCol, int nextRow, int nextCol)
 	{
 		// 移動後のブロックの移動後情報
 		int nextNextRow = nextRow + (nextRow - preRow);
@@ -192,7 +192,7 @@ public class MoveManager : MonoBehaviour
 	/// <param name="nextRow">移動後縦情報</param>
 	/// <param name="nextCol">移動後横情報</param>
 	/// <returns>プレイヤー移動の可否</returns>
-	public bool PlayerMoveCheck(int preRow, int preCol, int nextRow, int nextCol)
+	private bool PlayerMoveCheck(int preRow, int preCol, int nextRow, int nextCol)
 	{
 		/*
 		 * プレイヤーの移動先が動くブロックの時

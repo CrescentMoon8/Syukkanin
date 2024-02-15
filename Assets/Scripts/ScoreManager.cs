@@ -54,9 +54,9 @@ public class ScoreManager : MonoBehaviour
 
     #region プロパティ
     // スコア
-    public int Score { get => _score; set => _score = value; }
+    public int Score { get { return _score; } }
     // 難易度
-    public int GameLevel { get => _gameLevel; set => _gameLevel = value; }
+    public int GameLevel { get { return _gameLevel; } }
     #endregion
 
     #region メソッド
@@ -81,11 +81,11 @@ public class ScoreManager : MonoBehaviour
     public void ScoreUpdate()
     {
         // スコアを加算する
-        Score += BASE_SCORE * GameLevel;
+        _score += BASE_SCORE * GameLevel;
         // ゲームレベルの上昇及びその判定を行う
         LevelUpdate();
         // スコアテキストを変更する
-        _scoreText.SetText(Score.ToString());
+        _scoreText.SetText(_score.ToString());
         // 難易度テキストを変更する
         _levelText.SetText(_gameLevel.ToString());
     }
@@ -103,10 +103,10 @@ public class ScoreManager : MonoBehaviour
         else
         {
             // スコアが一定数を超えたら
-            if(Score >= LEVELUP_SCORE * GameLevel * GameLevel)
+            if(_score >= LEVELUP_SCORE * GameLevel * GameLevel)
             {
                 // 難易度を上昇させる
-                GameLevel++;
+                _gameLevel++;
                 // レベルアップ時のSEを再生する
                 _audioController.LevelUpSe();
 
