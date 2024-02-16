@@ -66,8 +66,8 @@ public class StageArrayData : MonoBehaviour
 		SetStageMaxSize();
 		// ステージ、ターゲットの配列の大きさを設定する
 		// 座標と配列の大きさのずれをなくすために＋１する
-		StageArray = new int[VerticalMaxSize + 1, HorizontalMaxSize + 1];
-		TargetData = new int[VerticalMaxSize + 1, HorizontalMaxSize + 1];
+		StageArray = new int[_verticalMaxSize + 1, _horizontalMaxSize + 1];
+		TargetData = new int[_verticalMaxSize + 1, _horizontalMaxSize + 1];
 		// マップイメージを配列に格納する
 		ImageToArray();
 	}
@@ -108,14 +108,14 @@ public class StageArrayData : MonoBehaviour
 			int positionY = Mathf.FloorToInt(-stageObject.position.y);
 
 			// 座標と現在の横の最大サイズを比較する
-			if(HorizontalMaxSize < positionX)
+			if(_horizontalMaxSize < positionX)
             {
 				// 横の最大サイズを設定する
 				_horizontalMaxSize = positionX;
             }
 
 			// 座標と現在の縦の最大サイズを比較する
-			if (VerticalMaxSize < positionY)
+			if (_verticalMaxSize < positionY)
             {
 				// 縦の最大サイズを設定する
 				_verticalMaxSize = positionY;
