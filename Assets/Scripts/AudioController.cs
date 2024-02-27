@@ -2,6 +2,7 @@
 // AudioController.cs
 //
 // 作成日:2023/11/04
+// 改修開始日:2024/02/27
 // 作成者:小林慎
 // ---------------------------------------------------------
 using UnityEngine;
@@ -22,8 +23,7 @@ public class AudioController : MonoBehaviour
 
 	private string _seObjectTag = "SE";
 
-	// 各クラスの定義
-	private AudioSource _audioObject = default;
+	private AudioSource _audioSource = default;
 	#endregion
 
 	#region プロパティ
@@ -37,7 +37,7 @@ public class AudioController : MonoBehaviour
 	private void Awake()
 	{
 		// 各クラスの初期化
-		_audioObject = GameObject.FindWithTag(_seObjectTag).GetComponent<AudioSource>();
+		_audioSource = GameObject.FindWithTag(_seObjectTag).GetComponent<AudioSource>();
 	}
 
 	/// <summary>
@@ -46,7 +46,7 @@ public class AudioController : MonoBehaviour
 	public void DestroySe()
 	{
 		// ブロックが壊れた時のSEを再生する
-		_audioObject.PlayOneShot(_destroySe);
+		_audioSource.PlayOneShot(_destroySe);
 	}
 
 	/// <summary>
@@ -55,7 +55,7 @@ public class AudioController : MonoBehaviour
 	public void LevelUpSe()
 	{
 		// ゲームレベルが上がった時のSEを再生する
-		_audioObject.PlayOneShot(_levelUpSe);
+		_audioSource.PlayOneShot(_levelUpSe);
 	}
 	#endregion
 }

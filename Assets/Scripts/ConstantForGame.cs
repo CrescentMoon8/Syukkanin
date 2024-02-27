@@ -4,11 +4,9 @@
 // 作成日:2023/11/09
 // 作成者:小林慎
 // ---------------------------------------------------------
-using UnityEngine;
-using System.Collections;
 
 /// <summary>
-/// ゲームに用いる定数を宣言している
+/// ゲームに用いる定数を管理する
 /// </summary>
 public class ConstantForGame
 {

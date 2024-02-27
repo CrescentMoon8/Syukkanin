@@ -1,5 +1,5 @@
 // ---------------------------------------------------------
-// TileMapTest.cs
+// StageArrayDataForTilemap.cs
 //
 // 作成日:2024/02/16
 // 作成者:小林慎
@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Collections;
 
-public class TileMapTest : MonoBehaviour
+public class StageArrayDataForTilemap : MonoBehaviour
 {
 	#region 変数
 	private Tilemap _tilemap = default;
@@ -30,8 +30,9 @@ public class TileMapTest : MonoBehaviour
 	#endregion
 
 	#region プロパティ
+	public Tilemap GettingTileMap { get { return _tilemap; } }
 	// プレイヤーの座標
-	public Vector2 PlayerPosition { get; set; }
+	public Vector2Int PlayerPosition { get; set; }
 	// ステージの情報を入れるための配列
 	public int[,] StageArray { get; set; }
 	// ターゲットの情報を入れるための配列
@@ -48,7 +49,7 @@ public class TileMapTest : MonoBehaviour
 	/// </summary>
 	private void Awake()
 	{
-		_tilemap = GetComponent<Tilemap>();
+		_tilemap = GameObject.FindWithTag("StageMap").GetComponent<Tilemap>();
 		// マップの最大サイズを設定する
 		SetStageMaxSize();
 		// ステージ、ターゲットの配列の大きさを設定する
@@ -86,10 +87,9 @@ public class TileMapTest : MonoBehaviour
 	/// </summary>
 	private void SetStageMaxSize()
 	{
-		Debug.Log(_tilemap.cellBounds.max.x);
-		Debug.Log(_tilemap.cellBounds.min.y);
 		_horizontalMaxSize = _tilemap.cellBounds.max.x;
 		_verticalMaxSize = -_tilemap.cellBounds.min.y;
+		Debug.Log(_tilemap.GetTile(new Vector3Int(0, -1)));
 	}
 
 	private void ImageToArray()
@@ -98,26 +98,33 @@ public class TileMapTest : MonoBehaviour
         {
             for (int j = 0; j < _horizontalMaxSize; j++)
             {
-				if (!_tilemap.HasTile(new Vector3Int(j, -i)))
+				// ワールド座標とタイルマップ座標のずれをなくすため＋１する
+				// 座標と配列番号を合わせるためにマイナスをつける
+				Vector3Int searchPos = new Vector3Int(j, -i);
+
+				// 指定した座標にタイルがなければ処理をスキップする
+				if (!_tilemap.HasTile(searchPos))
                 {
 					continue;
                 }
-				if(_tilemap.GetTile(new Vector3Int(j, -i)).Equals(_staticBlockTile))
+
+				// 指定した座標のタイルによって配列情報をセットする
+				if(_tilemap.GetTile(searchPos).Equals(_staticBlockTile))
                 {
 					StageArray[i, j] = ConstantForGame.STATIC_BLOCK;
 				}
-				else if (_tilemap.GetTile(new Vector3Int(j, -i)).Equals(_moveBlockTile))
+				else if (_tilemap.GetTile(searchPos).Equals(_moveBlockTile))
 				{
 					StageArray[i, j] = ConstantForGame.MOVE_BLOCK;
 				}
-				else if (_tilemap.GetTile(new Vector3Int(j, -i)).Equals(_playerTile))
+				else if (_tilemap.GetTile(searchPos).Equals(_playerTile))
 				{
 					StageArray[i, j] = ConstantForGame.PLAYER;
 
 					// プレイヤーの座標を代入する
-					PlayerPosition = new Vector2(i, -j);
+					PlayerPosition = new Vector2Int(i, j);
 				}
-				else if (_tilemap.GetTile(new Vector3Int(j, -i)).Equals(_targetAreaTile))
+				else if (_tilemap.GetTile(searchPos).Equals(_targetAreaTile))
 				{
 					StageArray[i, j] = ConstantForGame.TARGET_AREA;
 				}
@@ -127,5 +134,35 @@ public class TileMapTest : MonoBehaviour
 		// ステージの配列情報をターゲット判定用の配列へコピーする
 		TargetData = (int[,])StageArray.Clone();
 	}
+
+	/// <summary>
+	/// ステージにあるオブジェクトを取得する
+	/// </summary>
+	/// <param name="tagId">取得するオブジェクトを指定</param>
+	/// <param name="row"></param>
+	/// <param name="col"></param>
+	/// <returns></returns>
+	public TileBase GetStageObject(int row, int col)
+	{
+        // rootObject内の全てのオブジェクトを検索する
+        foreach (Vector3Int pos in _tilemap.cellBounds.allPositionsWithin)
+        {
+			/*Debug.LogError(_tilemap.GetTile(pos));
+			Vector3Int tilePos = pos + Vector3Int.up;
+
+            // オブジェクトの座標が渡された引数と同じだったら
+            if (tilePos.x == col && tilePos.y == -row)
+            {
+                return _tilemap.GetTile(tilePos);
+            }*/
+
+			if(pos.x == col && pos.y == -row)
+            {
+				return _tilemap.GetTile(pos);
+            }
+        }
+
+        return null;
+    }
 	#endregion
 }

@@ -2,6 +2,7 @@
 // ScoreManager.cs
 //
 // 作成日:2023/10/26
+// 改修開始日:2024/02/27
 // 作成者:小林慎
 // ---------------------------------------------------------
 using UnityEngine;
@@ -47,7 +48,6 @@ public class ScoreManager : MonoBehaviour
 
     #region クラス
     // 各クラスの定義
-    private BlockProcess _blockProcess = default;
     private AudioController _audioController = default;
     #endregion
     #endregion
@@ -71,7 +71,6 @@ public class ScoreManager : MonoBehaviour
         _levelText = GameObject.FindWithTag(_gameLevelTextTag).GetComponent<TMP_Text>();
 
         // 各クラスの初期化
-        _blockProcess = GetComponent<BlockProcess>();
         _audioController = GetComponent<AudioController>();
     }
 
@@ -82,8 +81,6 @@ public class ScoreManager : MonoBehaviour
     {
         // スコアを加算する
         _score += BASE_SCORE * GameLevel;
-        // ゲームレベルの上昇及びその判定を行う
-        LevelUpdate();
         // スコアテキストを変更する
         _scoreText.SetText(_score.ToString());
         // 難易度テキストを変更する
@@ -93,41 +90,21 @@ public class ScoreManager : MonoBehaviour
     /// <summary>
     /// 難易度の上昇及びその判定を行う
     /// </summary>
-    public void LevelUpdate()
+    /// <returns>レベルアップしたかどうか</returns>
+    public bool LevelUpdate()
     {
-        // 難易度が最大なら処理を抜ける
-        if (GameLevel >= MAX_GAME_LEVEL)
+        // スコアが一定数を超えたら
+        if (_score >= LEVELUP_SCORE * GameLevel * GameLevel)
         {
-            return;
+            // 難易度を上昇させる
+            _gameLevel++;
+            // レベルアップ時のSEを再生する
+            _audioController.LevelUpSe();
+
+            return true;
         }
-        else
-        {
-            // スコアが一定数を超えたら
-            if(_score >= LEVELUP_SCORE * GameLevel * GameLevel)
-            {
-                // 難易度を上昇させる
-                _gameLevel++;
-                // レベルアップ時のSEを再生する
-                _audioController.LevelUpSe();
 
-                // 特定の難易度になったら
-                switch(GameLevel)
-                {
-                    case ConstantForGame.INTERMEDIATE:
-                        // StaticBlockを追加する
-                        _blockProcess.CreateStage();
-                        break;
-
-                    case ConstantForGame.MASTER:
-                        // StaticBlockを追加する
-                        _blockProcess.CreateStage();
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-        }
+        return false;
     }
 	#endregion
 }

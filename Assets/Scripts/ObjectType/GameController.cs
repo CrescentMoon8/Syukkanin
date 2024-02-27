@@ -2,6 +2,7 @@
 // GameController.cs
 //
 // 作成日:2023/10/25
+// 改修開始日:2024/02/27
 // 作成者:小林慎
 // ---------------------------------------------------------
 using UnityEngine;
@@ -23,24 +24,26 @@ public class GameController : MonoBehaviour
 	/// ４　ステージ生成
 	/// ５　ブロック生成
 	/// ６　ブロック破壊
-	/// ７　スコア加算、ゲームレベル変更
-	/// ８　ゲーム終了
+	/// ７　スコア加算
+	/// ８　難易度変更
+	/// ９　ゲーム終了
 	/// </summary>
 	private enum GameState
 	{
-		START,
-		STOP,
-		PLAY,
-		CREATE_STAGE,
-		CREATE_BLOCK,
-		DELETE_BLOCK,
-		SCORE,
-		END,
+		Start,
+		Stop,
+		Play,
+		CreateStage,
+		CreateBlock,
+		DeleteBlock,
+		ScoreUp,
+		DifficultUp,
+		End,
 	}
 
 	// 現在のゲームの状態
 	[SerializeField] 
-	private GameState _gameState = GameState.START;
+	private GameState _gameState = GameState.Start;
     #endregion
 
     #region 入力
@@ -81,11 +84,6 @@ public class GameController : MonoBehaviour
     // ポーズ時に表示するパネル
     [SerializeField] 
 	private GameObject _posePanel = default;
-	// ポーズ時に表示するテキスト
-    [SerializeField] 
-	private TMPro.TMP_Text _poseText = default;
-    [SerializeField] 
-	private TMPro.TMP_Text _goTitleText = default;
     #endregion
 
     #region シーン名
@@ -131,12 +129,12 @@ public class GameController : MonoBehaviour
 		// 現在のゲームの状態によって処理を変える
 		switch(_gameState)
         {
-			case GameState.START:
+			case GameState.Start:
 				// 状態をステージ生成に移行する
-				_gameState = GameState.CREATE_STAGE;
+				_gameState = GameState.CreateStage;
 				break;
 
-			case GameState.STOP:
+			case GameState.Stop:
 				// Pキー、Xボタンが押されたか
 				if (Input.GetButtonDown(_poseInput))
 				{
@@ -144,10 +142,8 @@ public class GameController : MonoBehaviour
 					Time.timeScale = 1;
 					// ポーズ中のパネル、テキストを無効化する
                     _posePanel.SetActive(false);
-					_poseText.gameObject.SetActive(false);
-					_goTitleText.enabled = false;
 					// 状態をプレイ中に移行する
-                    _gameState = GameState.PLAY;
+                    _gameState = GameState.Play;
 				}
 
 				// Tキー、Bボタンが押されたか
@@ -160,7 +156,7 @@ public class GameController : MonoBehaviour
 				}
 				break;
 
-			case GameState.PLAY:
+			case GameState.Play:
                 // 動かせるブロックを生成するまでの時間を加算する
                 _createBlockTime += Time.deltaTime;
 
@@ -170,7 +166,7 @@ public class GameController : MonoBehaviour
 					// ステージの空マスを抽出する
                     _blockProcess.SetCell();
 					// 状態をブロック生成へ移行する
-                    _gameState = GameState.CREATE_BLOCK;
+                    _gameState = GameState.CreateBlock;
                 }
 
 				// Pキー、Xボタンが押されたか
@@ -180,10 +176,8 @@ public class GameController : MonoBehaviour
                     Time.timeScale = 0;
 					// ポーズ中のパネル、テキストを有効化する
 					_posePanel.SetActive(true);
-					_poseText.gameObject.SetActive(true);
-					_goTitleText.gameObject.SetActive(true);
 					// 状態をポーズに移行する
-                    _gameState = GameState.STOP;
+                    _gameState = GameState.Stop;
                 }
 
 				//横方向の入力を取得する
@@ -276,23 +270,22 @@ public class GameController : MonoBehaviour
 				}
 
 				// ブロックがそろった判定
-				if (_blockProcess.OnBlockAllTarget())
+				if (_moveManager.OnBlockAllTargetCheck())
 				{
-					// 状態をブロック破壊に移行する
-					_gameState = GameState.DELETE_BLOCK;
+					_gameState = GameState.DeleteBlock;
 				}
 				break;
 
-			case GameState.CREATE_STAGE:
+			case GameState.CreateStage:
 				// 空マスの情報をリストに追加する
 				_blockProcess.SetCell();
 				// 動かせないブロック及びM動かせるブロックをランダムに配置する
 				_blockProcess.CreateStage();
-				// 状態をプレイ中に移行する
-				_gameState = GameState.PLAY;
+
+				_gameState = GameState.Play;
 				break;
 
-			case GameState.CREATE_BLOCK:
+			case GameState.CreateBlock:
 				// ランダムにブロックを生成する
 				_blockProcess.CreateMoveBlock();
 				// 生成するまでの時間をリセットする
@@ -301,51 +294,61 @@ public class GameController : MonoBehaviour
 				// ゲームオーバーしたか
 				if(_blockProcess.IsGameOver)
                 {
-					// 状態をゲームーバーに移行する
-					_gameState = GameState.END;
+					_gameState = GameState.End;
                 }
                 else
                 {
-					// 状態をプレイ中に移行する
-					_gameState = GameState.PLAY;
+					_gameState = GameState.Play;
 				}
 				break;
 
-			case GameState.DELETE_BLOCK:
+			case GameState.DeleteBlock:
 				// ブロックを削除する
 				_blockProcess.DeleteBlock();
-				// 状態をスコア加算に移行する
-				_gameState = GameState.SCORE;
+
+				_gameState = GameState.ScoreUp;
 				break;
 
-			case GameState.SCORE:
+			case GameState.ScoreUp:
                 // ブロックを引ける状態を解除する
                 _moveManager.SetFalsePullMode();
                 // スコアとゲームレベルの更新を行う
                 _scoreManager.ScoreUpdate();
-				// ゲームレベルが上がったらブロックの生成間隔を短くする
-                switch (_scoreManager.GameLevel)
+
+				if(_scoreManager.LevelUpdate())
                 {
+					_gameState = GameState.DifficultUp;
+                }
+				
+				_gameState = GameState.Play;
+				break;
+
+			case GameState.DifficultUp:
+				// ゲームレベルが上がったらブロックの生成間隔を短くし、動かせないブロックを追加する
+				switch (_scoreManager.GameLevel)
+				{
 					case ConstantForGame.BEGINNER:
 						_createBlockInterval = ConstantForGame.EASY;
 						break;
 					case ConstantForGame.INTERMEDIATE:
-                        _createBlockInterval = ConstantForGame.NORMAL;
+						_createBlockInterval = ConstantForGame.NORMAL;
+						_blockProcess.CreateStage();
 						break;
 					case ConstantForGame.EXPERT:
 						_createBlockInterval = ConstantForGame.HARD;
 						break;
 					case ConstantForGame.MASTER:
-                        _createBlockInterval = ConstantForGame.VERYHARD;
-                        break;
+						_createBlockInterval = ConstantForGame.VERYHARD;
+						_blockProcess.CreateStage();
+						break;
 					default:
 						break;
 				}
-				// 状態をプレイ中に移行する
-				_gameState = GameState.PLAY;
+
+				_gameState = GameState.Play;
 				break;
 
-			case GameState.END:
+			case GameState.End:
 				// ゲームが終了してからの時間を計る
 				_afterGameTime += Time.deltaTime;
 				// ゲームが終了してから指定秒数経過したか
